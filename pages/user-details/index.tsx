@@ -1,50 +1,45 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-
+import useSWR from "swr";
 interface user {
   id: number;
   firstName: string;
   lastName: string;
-  Loading: boolean;
+}
+interface UserData {
+  users: user[];
 }
 
+const fetcher = (
+  url: string
+): Promise<UserData> => fetch(url).then((res: any) => res.json()); // fetch data using SWR
+
 function Index() {
-  const [data, setData] = useState<user[] | null>([]);
-  const [loading, setLoading] = useState<user[] | boolean>(true);
+  const { data, error } = useSWR<UserData>(
+    "https://dummyjson.com/users",
+    fetcher
+  );
 
-  useEffect(() => {
-    fetch();
-  }, []);
-
-  const fetch = async () => {
-    try {
-      const get = await axios.get("https://dummyjson.com/users");
-      setData(get.data.users);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  if (loading) {
-    return  <h1>Loading data......</h1>
+  if (!data) {
+    return <h1>Loading data......</h1>;
+  }
+  if (error) {
+    return <h1>Error loading data.</h1>;
   }
 
   return (
     <>
       <h1>users list:</h1>
       <br />
-      {data &&
-        data?.map((user) => {
-          return (
-            <Link key={user.id} href={`/user-details/${user.id}`}>
-              <div>
-                {user.firstName} {user.lastName}
-              </div>
-            </Link>
-          );
-        })}
+      {data.users &&
+        data.users.map((item) => (
+          <Link key={item.id} href={`/user-details/${item.id}`}>
+            <div>
+              {item.firstName} {item.lastName}
+            </div>
+          </Link>
+        ))}
     </>
   );
 }

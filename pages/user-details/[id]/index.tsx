@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import useSWR from "swr";
 
 interface UserData {
   id: number;
@@ -8,36 +8,32 @@ interface UserData {
   lastName: string;
   email: string;
 }
+
+
+const fecth = (url: string): Promise<UserData> =>
+  axios.get(url).then((res) => res.data);
+
 export default function UserDetails() {
-  const router = useRouter()
-  const { query } = useRouter();
-  const [user, setUser] = useState<UserData | null>(null);
+  const router = useRouter();
+  const { data, error, isLoading } = useSWR<UserData>(
+    router.query.id ? `https://dummyjson.com/users/${router.query.id}` : null,
+    fecth
+  );
+  console.log(data);
 
-  useEffect(() => {
-    if (query.id) {
-      fetchData();
-    }
-  }, [query.id]);
-
-  const fetchData = async () => {
-    try {
-      const res = await axios.get(`https://dummyjson.com/users/${query.id}`);
-      setUser(res.data);
-      console.log(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  if (isLoading) {
+    return <h1>loading.....</h1>;
+  }
   return (
     <>
       <div>
-        <button onClick={()=> router.push("/user-details")}>Back</button>
-        {user && (
-          <React.Fragment>
-            <div>{user.firstName}</div>
+        <button onClick={() => router.push("/user-details")}>Back</button>
+        {data && (
+          <>
+            <div>{data.firstName}</div>
             <br />
-            <div>{user.email}</div>
-          </React.Fragment>
+            <div>{data.email}</div>
+          </>
         )}
       </div>
     </>
