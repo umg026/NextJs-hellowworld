@@ -9,7 +9,6 @@ interface UserData {
   email: string;
 }
 
-
 const fecth = (url: string): Promise<UserData> =>
   axios.get(url).then((res) => res.data);
 
