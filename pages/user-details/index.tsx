@@ -1,7 +1,9 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import useSWR from "swr";
+import styles from "../../styles/server.module.css";
+import Image from "next/image";
+
 interface user {
   id: number;
   firstName: string;
@@ -11,9 +13,8 @@ interface UserData {
   users: user[];
 }
 
-const fetcher = (
-  url: string
-): Promise<UserData> => fetch(url).then((res: any) => res.json()); // fetch data using SWR
+const fetcher = (url: string): Promise<UserData> =>
+  fetch(url).then((res: any) => res.json()); // fetch data using SWR
 
 function Index() {
   const { data, error } = useSWR<UserData>(
@@ -31,11 +32,12 @@ function Index() {
   return (
     <>
       <h1>users list:</h1>
+      <Image height={200} width={300} src={"https://mobisoftinfotech.com/resources/wp-content/uploads/2022/04/next-JS-framework.png"} alt="next image" />
       <br />
       {data.users &&
         data.users.map((item) => (
           <Link key={item.id} href={`/user-details/${item.id}`}>
-            <div>
+            <div className={styles.text}>
               {item.firstName} {item.lastName}
             </div>
           </Link>

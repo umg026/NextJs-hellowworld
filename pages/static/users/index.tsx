@@ -1,7 +1,4 @@
-import { GetServerSideProps } from "next";
-// import style from "../../styles/server.module.css";
-import style from "../../styles/server.module.css";
-
+import { GetStaticProps } from "next";
 
 interface User {
   id: number;
@@ -17,19 +14,19 @@ interface Props {
 
 const User: React.FC<Props> = ({ res }) => {
   // this is server side rendering in nextjs
-
+  //   console.log(res);
   return (
     <>
-      <h1 className="text-red-600 text-center">Users (SSR)</h1>
+      <h1>Users (SSG)</h1>
       <br />
       {res.users.map((user: any) => {
-        return <li key={user.id}>{user.email}</li>;
+        return <li key={user.id}>Number :{user.phone}</li>;
       })}
     </>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   // if you use this export func name then next automatically consider as server side render page
   const data = await fetch("https://dummyjson.com/users");
   const res = await data.json();
